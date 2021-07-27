@@ -949,7 +949,6 @@ class HueApi:
                     entity["entity_id"]
                 )
                 result[group_id]["lights"].append(light_id)
-                LOGGER.debug("Entity ID: %s LightID: %s State: %s", entity["entity_id"], light_id, entity["state"])
                 if entity["state"] == const.HASS_STATE_ON:
                     lights_on += 1
                     if lights_on == 1:
