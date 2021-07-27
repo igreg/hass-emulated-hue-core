@@ -292,14 +292,20 @@ class HueApi:
         # instead of directly getting groups should have a property
         # get groups instead so we can easily modify it
         group_conf = await self.config.async_get_storage_value("groups", group_id)
-        if group_id == "0" and "scene" in request_data:
+        if "scene" in request_data:
             # scene request
             scene = await self.config.async_get_storage_value(
                 "scenes", request_data["scene"], default={}
             )
-            for light_id, light_state in scene["lightstates"].items():
-                entity = await self.config.async_entity_by_light_id(light_id)
-                await self.__async_light_action(entity, light_state)
+            if "hass_scene_id" in scene:
+                # execute service to activate HASS scene
+                LOGGER.debug("Called HA service scene.turn_on for scene %s", scene["hass_scene_id"])
+                sceneservicedata = {"target":{"entity_id": "scene.bedroom_dim"}}
+                await self.hue.hass.call_service(const.HASS_DOMAIN_SCENE, const.HASS_SERVICE_TURN_ON, sceneservicedata)
+            else:
+                for light_id, light_state in scene["lightstates"].items():
+                    entity = await self.config.async_entity_by_light_id(light_id)
+                    await self.__async_light_action(entity, light_state)
         else:
             # forward request to all group lights
             # may need refactor to make __async_get_group_lights not an
