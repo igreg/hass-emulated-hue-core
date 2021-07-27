@@ -297,11 +297,11 @@ class HueApi:
             scene = await self.config.async_get_storage_value(
                 "scenes", request_data["scene"], default={}
             )
-            if "hass_scene_id" in scene:
+            if "entity_id" in scene:
                 # execute service to activate HASS scene
-                LOGGER.debug("Called HA service scene.turn_on for scene %s", scene["hass_scene_id"])
-                sceneservicedata = {"target":{"entity_id": "scene.bedroom_dim"}}
-                await self.hue.hass.call_service(const.HASS_DOMAIN_SCENE, const.HASS_SERVICE_TURN_ON, sceneservicedata)
+                LOGGER.debug("Calling HA service scene.turn_on for scene %s", scene["entity_id"])
+                data = {const.HASS_ATTR_ENTITY_ID: scene["entity_id"]}
+                await self.hue.hass.call_service(const.HASS_DOMAIN_SCENE, const.HASS_SERVICE_TURN_ON, data)
             else:
                 for light_id, light_state in scene["lightstates"].items():
                     entity = await self.config.async_entity_by_light_id(light_id)
