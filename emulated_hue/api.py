@@ -675,6 +675,7 @@ class HueApi:
             )
 
         # execute service
+        LOGGER.debug("Called HA service light.%s for light id %s", service, light_id)
         await self.hue.hass.call_service(const.HASS_DOMAIN_LIGHT, service, data)
 
     def __update_allowed(

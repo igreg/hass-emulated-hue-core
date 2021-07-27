@@ -70,8 +70,10 @@ if __name__ == "__main__":
     token = args.token
     if args.verbose or os.getenv("VERBOSE", "").strip() == "true":
         logger.setLevel(logging.DEBUG)
-    # turn down logging for hass-client
-    logging.getLogger("hass_client").setLevel(logging.INFO)
+        logging.getLogger("hass_client").setLevel(logging.DEBUG)
+    else:
+        # turn down logging for hass-client
+        logging.getLogger("hass_client").setLevel(logging.INFO)
 
     hue = HueEmulator(datapath, url, token, args.http_port, args.https_port)
 
