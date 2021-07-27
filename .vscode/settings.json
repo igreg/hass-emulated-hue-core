@@ -4,5 +4,6 @@
     ],
     "python.analysis.extraPaths": [
         "./emulated_hue"
-    ]
+    ],
+    "python.linting.pylintEnabled": true
 }
