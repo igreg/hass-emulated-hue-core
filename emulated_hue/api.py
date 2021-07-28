@@ -745,9 +745,13 @@ class HueApi:
             # This is a hass scene
             entity_id = retval["entity_id"]
             scene_entity = self.hue.hass.entity_registry.get(entity_id)
+            scene_state = self.hue.hass.get_state(entity_id, attribute=None)
             if not scene_entity:
                 raise Exception(f"Entity {entity_id} not found!")
-            retval["name"] = scene_entity["friendly_name"]
+            if "friendly_name" in scene_state:
+                retval["name"] = scene_state["friendly_name"]
+            else:
+                retval["name"] = entity_id
             if "area_id" in scene_entity:
                 area_id = scene_entity["area_id"]
                 group_id = await self.config.async_area_id_to_group_id(area_id)
