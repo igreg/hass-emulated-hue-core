@@ -744,7 +744,7 @@ class HueApi:
         if "entity_id" in retval:
             # This is a hass scene
             entity_id = retval["entity_id"]
-            scene_entity = self.hue.hass.get_state(entity_id, attribute=None)
+            scene_entity = self.hue.hass.entity_registry.get(entity_id)
             if not scene_entity:
                 raise Exception(f"Entity {entity_id} not found!")
             if "name" in scene_entity:
