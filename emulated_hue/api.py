@@ -740,14 +740,17 @@ class HueApi:
         self, entity: dict, light_config: Optional[dict] = None
     ) -> dict:
         """Convert a scene to its Hue bridge JSON representation."""
-        retval = entity
+        retval = copy.deepcopy(entity)
         if "entity_id" in retval:
             # This is a hass scene
             entity_id = retval["entity_id"]
             scene_entity = self.hue.hass.get_state(entity_id, attribute=None)
             if not scene_entity:
                 raise Exception(f"Entity {entity_id} not found!")
-            retval["name"] = scene_entity["name"]
+            if "name" in scene_entity:
+                retval["name"] = scene_entity["name"]
+            else:
+                retval["name"] = "No name"
             area_id = scene_entity["area_id"]
             retval["group"] = await self.config.async_area_id_to_group_id(area_id)
         else:
