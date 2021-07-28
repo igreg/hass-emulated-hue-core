@@ -199,6 +199,28 @@ class Config:
         await self.async_set_storage_value("groups", next_group_id, group_config)
         return next_group_id
 
+    async def async_entity_id_to_scene_id(self, entity_id: str) -> str:
+        """Get a unique scene_id number for the hass entity_id for a scene."""
+        scenes = await self.async_get_storage_value("scenes", default={})
+        for key, value in scenes.items():
+            if entity_id == value.get("entity_id"):
+                return key
+        # group does not yet exist in config, create default config
+        next_scene_id = "1"
+        if scenes:
+            next_scene_id = str(max(int(k) for k in scenes) + 1)
+        scene_config = {
+            "appdata": {"data": "PFHS1627374050", "version": "169" },
+            "entity_id": entity_id,
+            "group": 0,
+            "name": "test",
+            "recycle": False,
+            "transitiontime": "0",
+            "type": "GroupScene"            
+        }
+        await self.async_set_storage_value("scenes", next_scene_id, scene_config)
+        return next_scene_id
+
     async def async_get_group_config(self, group_id: str) -> dict:
         """Return group config for given group id."""
         conf = await self.async_get_storage_value("groups", group_id)
