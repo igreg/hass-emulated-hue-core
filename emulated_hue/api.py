@@ -747,12 +747,13 @@ class HueApi:
             scene_entity = self.hue.hass.entity_registry.get(entity_id)
             if not scene_entity:
                 raise Exception(f"Entity {entity_id} not found!")
-            if "name" in scene_entity:
-                retval["name"] = scene_entity["name"]
+            retval["name"] = scene_entity["friendly_name"]
+            if "area_id" in scene_entity:
+                area_id = scene_entity["area_id"]
+                group_id = await self.config.async_area_id_to_group_id(area_id)
             else:
-                retval["name"] = "No name"
-            area_id = scene_entity["area_id"]
-            retval["group"] = await self.config.async_area_id_to_group_id(area_id)
+                group_id = 0
+            retval["group"] = group_id
         else:
             # This is a regular scene. Use original code
             retval.pop("lightstates", None)
@@ -931,7 +932,7 @@ class HueApi:
 
         # local scenes first
         scenes = await self.config.async_get_storage_value("scenes", default={})
-        result = copy.deepcopy(scenes)
+        #result = copy.deepcopy(scenes)
         for scene_id, scene_conf in scenes.items():
             # no entity_id = not hass scene, use original code
             if "entity_id" not in scene_conf:
