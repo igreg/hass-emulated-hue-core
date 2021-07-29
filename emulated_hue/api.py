@@ -748,10 +748,9 @@ class HueApi:
             if not scene_entity:
                 raise Exception(f"Entity {entity_id} not found!")
             scene_state = self.hue.hass.get_state(entity_id, attribute=None)
-            LOGGER.debug("Entity %s", str(scene_entity))
-            LOGGER.debug("Entity %s", str(scene_state))
-            if "friendly_name" in scene_state:
-                retval["name"] = scene_state["friendly_name"]
+            scene_attr = scene_state["attributes"]
+            if "friendly_name" in scene_attr:
+                retval["name"] = scene_attr["friendly_name"]
             else:
                 retval["name"] = entity_id
             if "area_id" in scene_entity:
