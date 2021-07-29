@@ -73,8 +73,8 @@ def check_request(check_user=True, log_request=True):
     def func_wrapper(func):
         @functools.wraps(func)
         async def wrapped_func(cls, request: web.Request):
-            #if log_request: --Commented, trying to see why some requests aren't logged.
-            LOGGER.debug("[%s] %s %s", request.remote, request.method, request.path)
+            if log_request:
+                LOGGER.debug("[%s] %s %s", request.remote, request.method, request.path)
             # check username
             if check_user:
                 username = request.match_info.get("username")
@@ -259,7 +259,6 @@ class HueApi:
     @check_request()
     async def async_put_light_state(self, request: web.Request, request_data: dict):
         """Handle requests to perform action on a group of lights/room."""
-        LOGGER.debug("[%s] %s %s", request.remote, request.method, request.path)
         light_id = request.match_info["light_id"]
         username = request.match_info["username"]
         entity = await self.config.async_entity_by_light_id(light_id)
@@ -287,7 +286,6 @@ class HueApi:
     @check_request()
     async def async_group_action(self, request: web.Request, request_data: dict):
         """Handle requests to perform action on a group of lights/room."""
-        LOGGER.debug("[%s] %s %s", request.remote, request.method, request.path)
         group_id = request.match_info["group_id"]
         username = request.match_info["username"]
         # instead of directly getting groups should have a property
@@ -679,7 +677,6 @@ class HueApi:
             )
 
         # execute service
-        LOGGER.debug("Called HA service light.%s for light id %s", service, light_id)
         await self.hue.hass.call_service(const.HASS_DOMAIN_LIGHT, service, data)
 
     def __update_allowed(
