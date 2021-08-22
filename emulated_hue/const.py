@@ -72,3 +72,6 @@ HUE_ATTR_CT_MAX = 500
 
 HASS = "hass"
 HUE = "hue"
+
+HUE_HTTP_PORT = 80
+HUE_HTTPS_PORT = 443
