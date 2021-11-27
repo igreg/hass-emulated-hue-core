@@ -1,96 +1,53 @@
-<a href="https://github.com/hass-emulated-hue/core/actions"><img alt="GitHub Actions Build" src="https://github.com/hass-emulated-hue/core/actions/workflows/docker-build.yaml/badge.svg"></a>
-<a href="https://hub.docker.com/r/hassemulatedhue/core"><img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/hassemulatedhue/core.svg"></a>
-# Hue Emulation for Home Assistant
+<img width="1435" alt="image" src="https://user-images.githubusercontent.com/75016496/143686961-60067c38-71b7-4981-9298-e17729d18372.png">
 
-Convert your Home Assistant instance to a fully functional Philips HUE bridge!
-Control all lights connected to your Home Assistant box with HUE compatible apps/devices like the official Hue app, Hue essentials and Philips Ambilight+Hue etc.
+# Violet SmartSwitch Lite with Home Assistant
 
-## Features
-- Your Areas in Home Assistant will be auto created as rooms in the HUE app.
-- All your Home Assistant lights will be supported with full functionality.
-- Allow you to create your own HUE groups and scenes.
-- Secured connection and authentication flow (unlike default emulated hue component in hass).
-- Fully emulates a "V2" HUE bridge.
-- Loosely coupled with HomeAssistant over low-latency websockets.
-- Experimental support for HUE Entertainment (see below).
+The [Violet smart switch](https://violet-ultra.co.uk/product/smartswitch-lite-uk-eu/), at time of writing, integrates with a Phillips Hue hub and provides a beautiful touch screen interface allowing you to activate hue scenes. That's great, but I wanted to use the light switch with my [Shelly DUO bulbs](https://shelly.cloud/products/shelly-duo-smart-home-automation-bulb/) and I already have [Home Assistant](https://www.home-assistant.io/) running on a RaspberryPi, so here's an explanation of how I got that working, in case you want to do the same!
 
-## Use cases
-- You or your family like to use the HUE app for control over ALL your lights, so even non-Zigbee/HUE lights...
-- You've replaced the Official HUE bridge with ZHA/zigbee2mqtt and you miss some original HUE features.
-- You'd like to sync your lights with your TV/game (e.g. HUE Sync, Ambilight+HUE).
+The smart switch is expecting to talk to a Phillips Hue bridge on your network. The first thing I did was discover this great add-on for Home Assistant called Emulated Hue. It exposes an API to your network which the smart light switch will recognise as a Hue hub.
 
-## How to run/install/use this thing ?
-- Add the custom repository to the Home Assistant supervisor's add-on store: 
-  https://github.com/hass-emulated-hue/hassio-repo
-- Install the Emulated HUE addon from the addon-store
-- Start the newly installed addon and it will work instantly
+<img width="330" alt="image" src="https://user-images.githubusercontent.com/75016496/143687093-4ca38e30-9723-460d-abca-4e5c84f41214.png">
 
-Once started, it will be available as a HUE bridge on your network.
+Having the Emulated Hue add-on installed allows you to use an app like Hue Essentials (or any similar app, but not the official Hue app,) to control all of the lights that are connected to your Home Assistant. Do go and have a read of the full details of that add-on:
+https://github.com/hass-emulated-hue/core
 
-## How to connect to the virtual bridge ?
-- From your app/device (for example the official HUE app) search for HUE bridges.
-- Once the bridge is found by your app/device, there's a notification sent to Home Assistant if you want to enable pairing mode (same as pressing the physical button on the real bridge). It will show you a message in the notification area WITHIN Home Assistant.
-- Once you enabled pairing mode, your app has 30 seconds to connect.
+That's great, but the smart switch is all about scenes. Using the method above, you have to define the Hue scenes yourself via an app before the smart switch can use those scenes - but of course Home Assistant already has all my scenes defined, I'd rather use those! Because of that, I've enhanced the standard Hue Emulator code, (which is the purpose of this repo here on GitHub,) so that the home assistant scenes are the ones being shown to the switch!
 
-## Important notes
-- This virtual bridge runs at HTTP port 80 and HTTPS port 443 on your local network. These ports can not be changed as the HUE infrastructure requires them to be at these defaults.
-- If you're running the previous/legacy emulated HUE component in HASS, make sure to disable it first.
-- Remote Connection support is not available. This thing is local only (which is actually a good thing perhaps?).
+Now let's run through the setup:
 
-## Notes on Philips HUE Entertainment API support
-The [Hue Entertainment API](https://developers.meethue.com/develop/hue-entertainment/philips-hue-entertainment-api/) supports a communication protocol which allows a light streaming functionality with the Philips Hue System. Using this protocol, it is possible to stream lighting effects to multiple lights in parallel with a high update rate. It's used for new Ambilight+HUE TV's and the HUE Sync app on PC and Mac.
+#### 1. Add the repo to your add-on store in Home Assistant
+The Hue Emulator is in a custom repo, so you'll first need to add that repo to your add-on store:
 
-We've created a (highly experimental!) python implementation of this streaming protocol that actually works pretty well altough not as good as it's original. While packets are indeed live streamed (at a rate between 25-50 messages per second) to our virtual bridge, we unpack them and convert them to commands the light implementations can understand at a more sane rate level (throttling). We choose some settings which result in a nice effect with not too much delay without completely overloading a platform. This means that the Entertainment mode will work with **any light** connected to Home Assistant. Cool! 
+In Home Assistant, go to Supervisor > Add-on store > click the ellipses (3 dots thing in the top right)
+Choose 'Repositories' in the drop down.
+Paste the URL below into the 'Add' section and click the ADD button
+- https://github.com/hass-emulated-hue/hassio-repo
 
-The next step we have in mind is, if you own official HUE lights connected to ZHA, to forward the special Entertainment packets into the Zigbee mesh, resulting in the real streaming experience (realtime effects with no delay). 
+#### 2. Install the DEV version of the Emulated Hue add-on
+The dev version allows us to run a custom version of the code.
 
+<img width="700" alt="image" src="https://user-images.githubusercontent.com/75016496/143686988-03bade7c-4244-4563-b52a-838ca238c47e.png">
 
-## Backlog / TODO / Ideas:
-- Support other device types, like switches ?
-- Forward Entertainment UDP packages to Zigbee mesh for Official HUE lights that natively support the feature.
-- Read HASS scenes to HUE ?
-- Create HUE scenes, push to HASS scenes ?
-- Support for routines / automations ?
+#### 3. Point Emulated Hue to the custom code
 
-Please use the Github issue tracker for feature requests (including motivation) and off course for reporting any issues you may find!
+On the 'Configuration' tab for Emulated HUE (dev) just paste the path to my version of the code <b>finopsfuntimes:core:master</b> and click save.
+(You can of course just fork from my version of the code and use your own copy!)
 
+<img width="500" alt="image" src="https://user-images.githubusercontent.com/75016496/143687298-f01f334f-62a8-41f0-8545-d7321dce8618.png">
 
-## FAQ
+#### 4. Start the add-on
 
+On starting, the add-on first downloads the code from GitHub but go and keep an eye on the logs and make sure everything looks OK before moving over to the light switch!
 
-#### I do not want to have all my Home Assistant lights imported to HUE
-By default all your Home Assistant lights and areas will be imported to get you started quickly but you can customize this.
-In your Home Assistant config directory you'll find a folder for emulated_hue witha file called emulated_hue.json.
-In that file you can disable lights or groups by setting enabled to false.
-You can also delete a light in the HUE app. That will also mark the light as disabled.
+#### 5. Add the integration on the light switch!
 
+At this point you're back to just following the standard instructions for setting up the Violet smartswitch lite!
 
+Some notes:
+- When first connecting, there will be a notification in Home Assistant prompting you to enable pairing mode
+- In the Phillips Hue world, you have rooms - in Home assistant we have areas. These concepts are the same.
+- If your scenes in Home Assistant are not associated with an area, they will be found in the 'No area' room when setting up the switch.
 
-#### When I enable Entertainment mode my light/platform gets overwhelmed with commands
+(You might prefer to go and associate your scenes with relevant areas in HA before setting up the switch:)
+<img width="300" alt="image" src="https://user-images.githubusercontent.com/75016496/143687283-9ebf62c9-fb1a-435b-bae2-17b7997f8f67.png">
 
-Entertainment mode is heavy. It will send multiple commands per second to each light. If you hardware can't cope up with this we have an advanced little setting hidden in the above mentioned emulated_hue.json config file called "entertainment_throttle". Set a value (in milliseconds) to throttle requests to this light. A good value to start with is 500. Remember to stop the addon before you start editing this file.
-
-
-
-#### I run Home Assistant manually without all the supervisor stuff, can I still run this thing ?
-Sure, just run the docker image manually. We'll provide you with some sample run commands soon.
-
-
-#### How does this thing differ from the existing solution diyHue ?
-
-diyHue was created to be a hub on it's own. You can directly connect your lights and devices to it and it. You can see it as a minimal competitor for Home automation solutions like Home Assistant. Our approach is that we want to use Home Assistant as the "hub" connected to all our lights and devices. This emulator is just a translator between Home Assistant and the HUE api protocol and does not have any internal logic. 
-
-
-#### How does this thing differ from the default emulated hue component in Home Assistant ?
-The emulated Hue component in Home Assistant is a very basic implemention of the HUE API for the V1 HUE bridge which is soon to be discontinued by Philips. At that time it was meant to get Alexa/Google Home devices working with Home Assistant. In the meanwhile other solutions are available for that so the component is more or less absolute.
-
-
-#### Why is this an addon and not a Home Assistant integration
-Well this project actually started as integration, but we ran into some serious trouble:
-1) HUE requires the HUB to be on HTTP port 80 and HTTPS port 443
-2) The entertainment mode executable is not working with the Alpine docker image from Home Assistant.
-
-The current approach gives you the flexibility of running the emulated HUE bridge on a diferent machine than HA.
-
-#### How can I detect when entertainment is started?
-We now provide a binary sensor `binary_sensor.emulated_hue_entertainment_active` that will allow you to detect this event in Home Assistant.
