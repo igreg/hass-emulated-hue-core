@@ -1033,6 +1033,11 @@ class HueApi:
                     else:
                         group_conf["stream"]["active"] = False
                 result[group_id] = group_conf
+                continue
+            # Special case of area_id=null, provides a 'No area' group for hass scenes
+            if group_conf["area_id"] is None:
+                group_conf["name"] = "No area"
+                result[group_id] = group_conf
 
         # Hass areas/rooms
         for area in self.hue.hass.area_registry.values():
