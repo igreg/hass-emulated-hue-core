@@ -463,8 +463,6 @@ class HueApi:
         valid_user = True
         if not username or not await self.config.async_get_user(username):
             valid_user = False
-            # discovery config requested, enable discovery request
-            await self.config.async_enable_link_mode_discovery()
         result = await self.__async_get_bridge_config(full_details=valid_user)
         return send_json_response(result)
 
@@ -1154,7 +1152,7 @@ class HueApi:
                     "UTC": datetime.datetime.utcnow().isoformat().split(".")[0],
                     "localtime": datetime.datetime.now().isoformat().split(".")[0],
                     "timezone": self.config.get_storage_value(
-                        "bridge_config", "timezone", tzlocal.get_localzone().zone
+                        "bridge_config", "timezone", tzlocal.get_localzone_name()
                     ),
                     "whitelist": await self.__async_whitelist_to_bridge_config(),
                     "zigbeechannel": self.config.get_storage_value(
