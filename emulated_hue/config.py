@@ -220,13 +220,13 @@ class Config:
         if scenes:
             next_scene_id = str(max(int(k) for k in scenes) + 1)
         scene_config = {
-            "appdata": {"data": "PFHS1627374050", "version": "169" },
+            "appdata": {"data": "PFHS1627374050", "version": "169"},
             "entity_id": entity_id,
             "group": 0,
             "name": "test",
             "recycle": False,
             "transitiontime": "0",
-            "type": "GroupScene"            
+            "type": "GroupScene",
         }
         await self.async_set_storage_value("scenes", next_scene_id, scene_config)
         return next_scene_id

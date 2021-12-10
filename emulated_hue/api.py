@@ -299,9 +299,13 @@ class HueApi:
             )
             if "entity_id" in scene:
                 # execute service to activate HASS scene
-                LOGGER.debug("Calling HA service scene.turn_on for scene %s", scene["entity_id"])
+                LOGGER.debug(
+                    "Calling HA service scene.turn_on for scene %s", scene["entity_id"]
+                )
                 data = {const.HASS_ATTR_ENTITY_ID: scene["entity_id"]}
-                await self.hue.hass.call_service(const.HASS_DOMAIN_SCENE, const.HASS_SERVICE_TURN_ON, data)
+                await self.hue.hass.call_service(
+                    const.HASS_DOMAIN_SCENE, const.HASS_SERVICE_TURN_ON, data
+                )
             else:
                 for light_id, light_state in scene["lightstates"].items():
                     entity = await self.config.async_entity_by_light_id(light_id)
@@ -401,7 +405,7 @@ class HueApi:
     async def async_get_scenes(self, request: web.Request):
         """Handle requests to retrieve the info all scenes."""
         return send_json_response(await self.__async_get_all_scenes())
-    
+
     @routes.get("/api/{username}/{itemtype:(?:rules|resourcelinks)}")
     @check_request()
     async def async_get_localitems(self, request: web.Request):
@@ -973,7 +977,7 @@ class HueApi:
 
         # local scenes first
         scenes = await self.config.async_get_storage_value("scenes", default={})
-        #result = copy.deepcopy(scenes)
+        # result = copy.deepcopy(scenes)
         for scene_id, scene_conf in scenes.items():
             # no entity_id = not hass scene, use original code
             if "entity_id" not in scene_conf:
@@ -990,11 +994,10 @@ class HueApi:
             entity_id = entity["entity_id"]
             scene_id = await self.config.async_entity_id_to_scene_id(entity_id)
             # The scene may have only just been created by above method
-            scene_conf = await self.config.async_get_storage_value("scenes", scene_id) 
+            scene_conf = await self.config.async_get_storage_value("scenes", scene_id)
             result[scene_id] = await self.__async_scene_to_hue(scene_conf)
 
         return result
-
 
     async def __async_create_local_item(
         self, data: Any, itemtype: str = "scenes"
@@ -1062,7 +1065,9 @@ class HueApi:
                         entity_obj = await self.__async_entity_to_hue(entity)
                         result[group_id]["action"] = entity_obj["state"]
             result[group_id]["state"]["any_on"] = True if lights_on > 0 else False
-            result[group_id]["state"]["all_on"] = True if lights_on == len(result[group_id]["lights"]) else False
+            result[group_id]["state"]["all_on"] = (
+                True if lights_on == len(result[group_id]["lights"]) else False
+            )
 
         return result
 
