@@ -968,7 +968,7 @@ class HueApi:
         return result
 
     async def __async_get_all_scenes(self) -> dict:
-        """Create a dict of all scenes"""
+        """Create a dict of all scenes."""
         result = {}
 
         # local scenes first
