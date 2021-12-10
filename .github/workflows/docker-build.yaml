@@ -140,7 +140,7 @@ jobs:
             url: ghcr.io/hass-emulated-hue,
             username: GCHR_USERNAME,
             password: GHCR_PAT,
-            repo: ghcr.io/hass-emulated-hue/core
+            repo: ghcr.io/igreg/hass-emulated-hue-core
           }
     steps:
       - name: Download container artifact
@@ -235,7 +235,7 @@ jobs:
             url: ghcr.io/hass-emulated-hue,
             username: GCHR_USERNAME,
             password: GHCR_PAT,
-            repo: ghcr.io/hass-emulated-hue/core
+            repo: ghcr.io/igreg/hass-emulated-hue-core
           }
     steps:
       - name: Enable Experimental Docker Features
@@ -426,7 +426,7 @@ jobs:
             url: ghcr.io/hass-emulated-hue,
             username: GCHR_USERNAME,
             password: GHCR_PAT,
-            repo: ghcr.io/hass-emulated-hue/core
+            repo: ghcr.io/igreg/hass-emulated-hue-core
           }
         images:
           - {
